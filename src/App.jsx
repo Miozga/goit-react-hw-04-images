@@ -18,28 +18,31 @@ const App = () => {
   const [modalImage, setModalImage] = useState('');
 
   useEffect(() => {
-    if (query === '') return;
-    const fetchImages = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${BASE_URL}?q=${query}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-        );
-        const data = await response.json();
-        setImages(prevImages => [...prevImages, ...data.hits]);
-      } catch (error) {
-        console.error('Error fetching images:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchImages();
+    if (!query) return;
+    fetchImages(query, page);
   }, [query, page]);
 
+  const fetchImages = async (query, page) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${BASE_URL}?q=${query}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+      );
+      const data = await response.json();
+      setImages(prevImages => [...prevImages, ...data.hits]);
+    } catch (error) {
+      console.error('Error fetching images:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearch = newQuery => {
-    setQuery(newQuery);
-    setImages([]);
-    setPage(1);
+    if (newQuery !== query) {
+      setQuery(newQuery);
+      setImages([]);
+      setPage(1);
+    }
   };
 
   const handleLoadMore = () => {
